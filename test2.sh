@@ -1,4 +1,6 @@
 #!/bin/sh
+# This is a script I use to Enhance my solus installation automaticly. 
+# Since I have little to no scripting-experience, this script is heavilly based on Luke Smith's LARBS-installer
 # Luke's Auto Rice Boostrapping Script (LARBS)
 # by Luke Smith <luke@lukesmith.xyz>
 # License: GNU GPLv3
@@ -20,19 +22,19 @@ esac done
 ### FUNCTIONS ###
 
 welcomemsg() { \
-	dialog --title "Welcome!" --msgbox "Dit is mijn persoonlijke Solusverbeteraar!\\n\\nOm solus nog beter te maken.\\n\\n-Angelos" 10 60
+	dialog --title "Welcome!" --msgbox "This is my personal SOLus-ENhancer!\\n\\nJust to make it even better.\\n\\n-Nostro" 10 60
 
-	dialog --colors --title "Belangrijk!" --yes-label "Gaan!" --no-label "Terug..." --yesno "Het is belangrijk dat je internet hebt.\\n\\nZoniet kan de installatie vastlopen." 8 70
+	dialog --colors --title "Attention!" --yes-label "Ok-go!" --no-label "Back..." --yesno "An internetconnection is necessary.\\n\\nHope you're installing as root." 8 70
 	}
 
 getuserandpass() { \
 	# Prompts user for new username an password.
-	name=$(dialog --inputbox "Voor welke gebruike wil je de upgrade doorvoeren?" 10 60 3>&1 1>&2 2>&3 3>&1) || exit 1
+	name=$(dialog --inputbox "What user do you want to enhance?" 10 60 3>&1 1>&2 2>&3 3>&1) || exit 1
 	while ! echo "$name" | grep -q "^[a-z_][a-z0-9_-]*$"; do
-		name=$(dialog --no-cancel --inputbox "Username not valid. Give a username beginning with a letter, with only lowercase letters, - or _." 10 60 3>&1 1>&2 2>&3 3>&1)
+		name=$(dialog --no-cancel --inputbox "This username not is valid. Give a username beginning with a letter, with only lowercase letters, - or _." 10 60 3>&1 1>&2 2>&3 3>&1)
 	done
-	pass1=$(dialog --no-cancel --passwordbox "Stel je wachtwoord opnieuw in." 10 60 3>&1 1>&2 2>&3 3>&1)
-	pass2=$(dialog --no-cancel --passwordbox "Retype password." 10 60 3>&1 1>&2 2>&3 3>&1)
+	pass1=$(dialog --no-cancel --passwordbox "Enter a password." 10 60 3>&1 1>&2 2>&3 3>&1)
+	pass2=$(dialog --no-cancel --passwordbox "Retype the password." 10 60 3>&1 1>&2 2>&3 3>&1)
 	while ! [ "$pass1" = "$pass2" ]; do
 		unset pass2
 		pass1=$(dialog --no-cancel --passwordbox "Passwords do not match.\\n\\nEnter password again." 10 60 3>&1 1>&2 2>&3 3>&1)
@@ -56,14 +58,14 @@ baseinstall(){ eopkg install -y -c system.devel
 	}
 
 maininstall() { # Installs all needed programs from main repo.
-	dialog --title "LARBS Installation" --infobox "Installing \`$1\` ($n of $total). $1 $2" 5 70
+	dialog --title "Solus Enhancer" --infobox "Installing \`$1\` ($n of $total). $1 $2" 5 70
 	installpkg "$1"
 	}
 
 gitmakeinstall() {
 	progname="$(basename "$1" .git)"
 	dir="$repodir/$progname"
-	dialog --title "LARBS Installation" --infobox "Installing \`$progname\` ($n of $total) via \`git\` and \`make\`. $(basename "$1") $2" 5 70
+	dialog --title "Solus Enhancer" --infobox "Installing \`$progname\` ($n of $total) via \`git\` and \`make\`. $(basename "$1") $2" 5 70
 	sudo -u "$name" git clone --depth 1 "$1" "$dir" >/dev/null 2>&1 || { cd "$dir" || return 1 ; sudo -u "$name" git pull --force origin master;}
 	cd "$dir" || exit 1
 	make >/dev/null 2>&1
@@ -71,7 +73,7 @@ gitmakeinstall() {
 	cd /tmp || return 1 ;}
 
 pipinstall() { \
-	dialog --title "LARBS Installation" --infobox "Installing the Python package \`$1\` ($n of $total). $1 $2" 5 70
+	dialog --title "Solus Enhancer" --infobox "Installing the Python package \`$1\` ($n of $total). $1 $2" 5 70
 	[ -x "$(command -v "pip")" ] || installpkg python-pip >/dev/null 2>&1
 	yes | pip install "$1"
 	}
@@ -104,12 +106,12 @@ systembeepoff() { dialog --infobox "Getting rid of that retarded error beep soun
 	echo "blacklist pcspkr" > /etc/modprobe.d/nobeep.conf ;}
 
 newperms() { # Set special sudoers settings for install (or after).
-	sed -i "SEGDON/d" /etc/sudoers
-	echo "$* #SEGDON" >> /etc/sudoers ;}
+	sed -i "SOLEN/d" /etc/sudoers
+	echo "$* #SOLEN" >> /etc/sudoers ;}
 
 finalize(){ \
 	dialog --infobox "Preparing welcome message..." 4 50
-	dialog --title "All done!" --msgbox "Congrats! Provided there were no hidden errors, the script completed successfully and all the programs and configuration files should be in place.\\n\\nTo run the new graphical environment, log out and log back in as your new user, then run the command \"startx\" to start the graphical environment (it will start automatically in tty1).\\n\\n.t Luke" 12 80
+	dialog --title "All done!" --msgbox "Congrats! Enhancement is all done. Best to reboot though.\\n\\n.t Nostro" 12 80
 	}
 
 ##############################################################################################
@@ -190,8 +192,7 @@ killall pulseaudio; sudo -u "$name" pulseaudio --start
 
 # This line, overwriting the `newperms` command above will allow the user to run
 # serveral important commands, `shutdown`, `reboot`, updating, etc. without a password.
-newperms "%wheel ALL=(ALL) NOPASSWD: ALL #LARBS
-%wheel ALL=(ALL) NOPASSWD: /usr/bin/shutdown,/usr/bin/reboot,/usr/bin/systemctl"
+newperms "%wheel ALL=(ALL) NOPASSWD: ALL #SOLEN
 
 # Last message! Install complete!
 finalize
