@@ -102,7 +102,7 @@ putgitrepo() { # Downloads a gitrepo $1 and places the files in $2 only overwrit
 systembeepoff() { dialog --infobox "Getting rid of that retarded error beep sound..." 10 50
 	rmmod pcspkr
 	echo "blacklist pcspkr" > /etc/modprobe.d/nobeep.conf ;}
-i
+
 newperms() { # Set special sudoers settings for install (or after).
 	sed -i "SEGDON/d" /etc/sudoers
 	echo "$* #SEGDON" >> /etc/sudoers ;}
