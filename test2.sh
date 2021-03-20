@@ -1,5 +1,5 @@
 #!/bin/sh
-# This is a script I use to Enhance my solus installation automaticly. 
+# This is a script I use to Enhance my solus installation automaticly.
 # Since I have little to no scripting-experience, this script is heavilly based on Luke Smith's LARBS-installer
 # Luke's Auto Rice Boostrapping Script (LARBS)
 # by Luke Smith <luke@lukesmith.xyz>
@@ -102,8 +102,8 @@ putgitrepo() { # Downloads a gitrepo $1 and places the files in $2 only overwrit
 	}
 
 systembeepoff() { dialog --infobox "Getting rid of that retarded error beep sound..." 10 50
-	rmmod pcspkr
-	echo "blacklist pcspkr" > /etc/modprobe.d/nobeep.conf ;}
+	/sbin/rmmod pcspkr
+	echo "blacklist pcspkr" > /etc/modules-load.d/nobeep.conf ;}
 
 newperms() { # Set special sudoers settings for install (or after).
 	sed -i "SOLEN/d" /etc/sudoers
@@ -144,13 +144,10 @@ baseinstall
 
 ### The rest of the script requires no user input.
 
-for x in curl git ntp; do
+for x in curl git; do
 	dialog --title "Solus enhancer" --infobox "Installing \`$x\` which is required to install and configure other programs." 5 70
 	installpkg "$x"
 done
-
-dialog --title "Solus enhancer" --infobox "Synchronizing system time to ensure successful and secure installation of software..." 4 70
-ntpdate 0.us.pool.ntp.org >/dev/null 2>&1
 
 # Use all cores for compilation.
 sed -i "s/-j2/-j$(nproc)/;s/^#MAKEFLAGS/MAKEFLAGS/" /etc/makepkg.conf
@@ -183,16 +180,9 @@ systembeepoff
 	Option "Tapping" "on"
 EndSection' > /etc/X11/xorg.conf.d/40-libinput.conf
 
-# Fix fluidsynth/pulseaudio issue.
-grep -q "OTHER_OPTS='-a pulseaudio -m alsa_seq -r 48000'" /etc/conf.d/fluidsynth ||
-	echo "OTHER_OPTS='-a pulseaudio -m alsa_seq -r 48000'" >> /etc/conf.d/fluidsynth
-
-# Start/restart PulseAudio.
-killall pulseaudio; sudo -u "$name" pulseaudio --start
-
 # This line, overwriting the `newperms` command above will allow the user to run
 # serveral important commands, `shutdown`, `reboot`, updating, etc. without a password.
-newperms "%wheel ALL=(ALL) NOPASSWD: ALL #SOLEN
+newperms "%wheel ALL=(ALL) NOPASSWD: ALL #SOLEN"
 
 # Last message! Install complete!
 finalize
