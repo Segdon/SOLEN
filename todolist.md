@@ -12,3 +12,5 @@
 
 *independent scripts (virtualbox i3 grub ...)
 
+*launcher (alfred, rofi, ...)
+
