@@ -22,28 +22,28 @@ esac done
 ### FUNCTIONS ###
 
 welcomemsg() { \
-	dialog --title "Welcome!" --msgbox "This is my personal SOLus-ENhancer!\\nJust to make Solus even better!\\n\\n-Nostro" 10 60
+	dialog --title "Welcome!" --msgbox "This is my personal SOLus-ENhancer!\\nJust to make Solus even better!\\n\\n-Nostro" 8 60
 
-	dialog --colors --title "Attention!" --yes-label "Ok-go!" --no-label "Back..." --yesno "An internet-connection is necessary.\\nHope you're installing as root." 8 70
+	dialog --colors --title "Attention!" --yes-label "Ok-go!" --no-label "Back..." --yesno "An internet-connection is necessary.\\nHope you're installing as root." 8 60
 	}
 
 getuserandpass() { \
 	# Prompts user for new username an password.
-	name=$(dialog --inputbox "What user do you want to enhance?" 10 60 3>&1 1>&2 2>&3 3>&1) || exit 1
+	name=$(dialog --inputbox "What user do you want to enhance?" 8 60 3>&1 1>&2 2>&3 3>&1) || exit 1
 	while ! echo "$name" | grep -q "^[a-z_][a-z0-9_-]*$"; do
-		name=$(dialog --no-cancel --inputbox "This username not is valid. Give a username beginning with a letter, with only lowercase letters, - or _." 10 60 3>&1 1>&2 2>&3 3>&1)
+		name=$(dialog --no-cancel --inputbox "This username not is valid. Give a username beginning with a letter, with only lowercase letters, - or _." 8 60 3>&1 1>&2 2>&3 3>&1)
 	done
-	pass1=$(dialog --no-cancel --passwordbox "Enter a password." 10 60 3>&1 1>&2 2>&3 3>&1)
-	pass2=$(dialog --no-cancel --passwordbox "Retype the password." 10 60 3>&1 1>&2 2>&3 3>&1)
+	pass1=$(dialog --no-cancel --passwordbox "Enter a password." 8 60 3>&1 1>&2 2>&3 3>&1)
+	pass2=$(dialog --no-cancel --passwordbox "Retype the password." 8 60 3>&1 1>&2 2>&3 3>&1)
 	while ! [ "$pass1" = "$pass2" ]; do
 		unset pass2
-		pass1=$(dialog --no-cancel --passwordbox "Passwords do not match.\\n\\nEnter password again." 10 60 3>&1 1>&2 2>&3 3>&1)
-		pass2=$(dialog --no-cancel --passwordbox "Retype password." 10 60 3>&1 1>&2 2>&3 3>&1)
+		pass1=$(dialog --no-cancel --passwordbox "Passwords do not match.\\n\\nEnter password again." 8 60 3>&1 1>&2 2>&3 3>&1)
+		pass2=$(dialog --no-cancel --passwordbox "Retype password." 8 60 3>&1 1>&2 2>&3 3>&1)
 	done ;}
 
 adduserandpass() { \
 	# Adds user `$name` with password $pass1.
-	dialog --infobox "checking user \"$name\"..." 4 50
+	dialog --infobox "checking user \"$name\"..." 8 60
 	usermod -a -G wheel "$name" && chown "$name":"$name" /home/"$name"
 	repodir="/home/$name/.local/src"; mkdir -p "$repodir"; chown -R "$name":"$name" "$(dirname "$repodir")"
 	echo "$name:$pass1" | chpasswd
@@ -58,14 +58,14 @@ baseinstall(){ eopkg install -y -c system.devel
 	}
 
 maininstall() { # Installs all needed programs from main repo.
-	dialog --title "Solus Enhancer" --infobox "Installing \`$1\` ($n of $total). $1 $2" 5 70
+	dialog --title "Solus Enhancer" --infobox "Installing \`$1\` ($n of $total). $1 $2" 8 60
 	installpkg "$1"
 	}
 
 gitmakeinstall() {
 	progname="$(basename "$1" .git)"
 	dir="$repodir/$progname"
-	dialog --title "Solus Enhancer" --infobox "Installing \`$progname\` ($n of $total) via \`git\` and \`make\`. $(basename "$1") $2" 5 70
+	dialog --title "Solus Enhancer" --infobox "Installing \`$progname\` ($n of $total) via \`git\` and \`make\`. $(basename "$1") $2" 8 60
 	sudo -u "$name" git clone --depth 1 "$1" "$dir" >/dev/null 2>&1 || { cd "$dir" || return 1 ; sudo -u "$name" git pull --force origin master;}
 	cd "$dir" || exit 1
 	make >/dev/null 2>&1
@@ -73,7 +73,7 @@ gitmakeinstall() {
 	cd /tmp || return 1 ;}
 
 pipinstall() { \
-	dialog --title "Solus Enhancer" --infobox "Installing the Python package \`$1\` ($n of $total). $1 $2" 5 70
+	dialog --title "Solus Enhancer" --infobox "Installing the Python package \`$1\` ($n of $total). $1 $2" 8 60
 	[ -x "$(command -v "pip")" ] || installpkg python-pip >/dev/null 2>&1
 	yes | pip install "$1"
 	}
@@ -92,7 +92,7 @@ installationloop() { \
 	done < /tmp/progs.csv ;}
 
 putgitrepo() { # Downloads a gitrepo $1 and places the files in $2 only overwriting conflicts
-	dialog --infobox "Downloading and installing config files..." 4 60
+	dialog --infobox "Downloading and installing config files..." 8 60
 	[ -z "$3" ] && branch="$repobranch"
 	dir=$(mktemp -d)
 	[ ! -d "$2" ] && mkdir -p "$2"
@@ -101,7 +101,7 @@ putgitrepo() { # Downloads a gitrepo $1 and places the files in $2 only overwrit
 	sudo -u "$name" cp -rfT "$dir" "$2"
 	}
 
-systembeepoff() { dialog --infobox "Getting rid of that retarded error beep sound..." 10 50
+systembeepoff() { dialog --infobox "Getting rid of that retarded error beep sound..." 8 60
 	/sbin/rmmod pcspkr
 	echo "blacklist pcspkr" > /etc/modules-load.d/nobeep.conf ;}
 
@@ -110,8 +110,8 @@ newperms() { # Set special sudoers settings for install (or after).
 	echo "$* #SOLEN" >> /etc/sudoers ;}
 
 finalize(){ \
-	dialog --infobox "Preparing welcome message..." 4 50
-	dialog --title "All done!" --msgbox "Congrats! Enhancement is all done. Great time to reboot.\\n\\n Nostro" 12 80
+	dialog --infobox "Preparing welcome message..." 8 60
+	dialog --title "All done!" --msgbox "Congrats! Enhancement is all done. Great time to reboot.\\n\\n Nostro" 8 60
 	}
 
 ##############################################################################################
@@ -133,6 +133,9 @@ welcomemsg || error "User exited."
 # Get and verify username and password.
 getuserandpass || error "User exited."
 
+# making user wheel and change password
+adduserandpass
+
 # Give warning if user already exists.
 #usercheck || error "User exited."
 
@@ -145,7 +148,7 @@ baseinstall
 ### The rest of the script requires no user input.
 
 for x in curl git; do
-	dialog --title "Solus enhancer" --infobox "Installing \`$x\` which is required to install and configure other programs." 5 70
+	dialog --title "Solus enhancer" --infobox "Installing \`$x\` which is required to install and configure other programs." 8 60
 	installpkg "$x"
 done
 
