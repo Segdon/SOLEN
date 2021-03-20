@@ -50,11 +50,11 @@ adduserandpass() { \
 	unset pass1 pass2 ;}
 
 
-installpkg(){ eopkg install -y "$1" >/dev/null 2>&1 ;}
+installpkg(){ eopkg install -y -q "$1" >/dev/null 2>&1 ;}
 
 error(){ clear; printf "ERROR:\\n%s\\n" "$1" >&2; exit 1;}
 
-baseinstall(){ eopkg install -y -c system.devel
+baseinstall(){ eopkg install -y -q -c system.devel
 	}
 
 maininstall() { # Installs all needed programs from main repo.
