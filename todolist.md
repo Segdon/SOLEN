@@ -14,3 +14,11 @@
 
 *launcher (alfred, rofi, ...)
 
+*eopkg install 
+kitty
+nodejes
+pipenv
+
+
+install font 
+npm install --save @fortawesome/fontawesome-free
